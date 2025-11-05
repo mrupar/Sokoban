@@ -1,6 +1,5 @@
 import gymnasium as gym
 import famnit_gym
-import heapq
 
 
 DIRS = {
@@ -66,11 +65,12 @@ def astar(player, crates, targets, map):
     g = 0
     h = heuristic(crates, targets)
 
-    heapq.heappush(heap, (g + h, g, player, crates, []))
+    heap.append((g + h, g, player, crates, []))
+
 
 
     while heap:
-        f, g, player, crates, path = heapq.heappop(heap)
+        f, g, player, crates, path = heap.pop(0)
 
         state = (player, crates)
         if state in visited:
@@ -91,7 +91,7 @@ def astar(player, crates, targets, map):
             if new_state not in visited:
                 g2 = g + 1
                 h2 = heuristic(new_crates, targets)
-                heapq.heappush(heap, (g2 + h2, g2, new_player, new_crates, path + [move]))
+                heap.append((g2 + h2, g2, new_player, new_crates, path + [move]))
 
     return None
 
