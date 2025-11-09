@@ -1,6 +1,3 @@
-import gymnasium as gym
-import famnit_gym
-
 DIRS = {
     0: (-1, 0),  # Up
     1: (0, 1),   # Right
@@ -53,7 +50,7 @@ def bfs(player, crates, targets, map):
 
     while queue:
         player, crates, path = queue.pop(0)
-        state = (player, crates)
+        state = (player, tuple(sorted(crates)))
 
         if state in visited:
             continue
@@ -75,21 +72,3 @@ def bfs(player, crates, targets, map):
                 queue.append((new_player, new_crates, path + [move]))
 
     return None
-
-# --- Main Execution ---
-env = gym.make("famnit_gym/Sokoban-v1", render_mode="human")
-observation, info = env.reset()
-
-player, crates, targets = get_player_crate_target_position(observation)
-
-solution = bfs(player, crates, targets, observation)
-
-if solution is None:
-    print("No solution found!")
-else:
-    print("Solution:", solution)
-    for a in solution:
-        observation, reward, terminated, truncated, info = env.step(a)
-        if terminated or truncated:
-            break
-    env.close()

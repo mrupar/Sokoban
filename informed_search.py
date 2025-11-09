@@ -1,5 +1,4 @@
-import gymnasium as gym
-import famnit_gym
+import heapq
 
 
 DIRS = {
@@ -65,12 +64,11 @@ def astar(player, crates, targets, map):
     g = 0
     h = heuristic(crates, targets)
 
-    heap.append((g + h, g, player, crates, []))
-
+    heapq.heappush(heap, (g + h, g, player, crates, []))
 
 
     while heap:
-        f, g, player, crates, path = heap.pop(0)
+        f, g, player, crates, path = heapq.heappop(heap)
 
         state = (player, crates)
         if state in visited:
@@ -91,25 +89,6 @@ def astar(player, crates, targets, map):
             if new_state not in visited:
                 g2 = g + 1
                 h2 = heuristic(new_crates, targets)
-                heap.append((g2 + h2, g2, new_player, new_crates, path + [move]))
+                heapq.heappush(heap, (g2 + h2, g2, new_player, new_crates, path + [move]))
 
     return None
-
-
-env = gym.make("famnit_gym/Sokoban-v1", render_mode="human")
-observation, info = env.reset()
-
-player, crates, targets = get_player_crate_target_position(observation)
-
-solution = astar(player, crates, targets, observation)
-
-if solution is None:
-    print("No solution found!")
-else:
-    print("Solution:", solution)
-    for a in solution:
-        observation, reward, terminated, truncated, info = env.step(a)
-        if terminated or truncated:
-            break
-    env.close()
-

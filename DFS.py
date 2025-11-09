@@ -1,6 +1,3 @@
-import gymnasium as gym
-import famnit_gym
-
 DIRS = {
     0: (-1, 0),  # Up
     1: (0, 1),   # Right
@@ -50,7 +47,7 @@ def dfs(player, crates, targets, map, max_depth=5000):
 
     while stack:
         player, crates, path = stack.pop()
-        state = (player, crates)
+        state = (player, tuple(sorted(crates)))
 
         if state in visited:
             continue
@@ -70,29 +67,11 @@ def dfs(player, crates, targets, map, max_depth=5000):
             if nxt is None:
                 continue
             new_player, new_crates = nxt
-            new_state = (new_player, new_crates)
+            new_state = (new_player, tuple(sorted(new_crates)))
 
             if new_state not in visited:
                 # Push next state to stack (LIFO)
                 stack.append((new_player, new_crates, path + [move]))
 
     return None
-
-# --- Main Execution ---
-env = gym.make("famnit_gym/Sokoban-v1", render_mode="human")
-observation, info = env.reset()
-
-player, crates, targets = get_player_crate_target_position(observation)
-
-solution = dfs(player, crates, targets, observation)
-
-if solution is None:
-    print("No solution found!")
-else:
-    print("Solution:", solution)
-    for a in solution:
-        observation, reward, terminated, truncated, info = env.step(a)
-        if terminated or truncated:
-            break
-    env.close()
 
