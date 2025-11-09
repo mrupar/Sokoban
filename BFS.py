@@ -1,23 +1,48 @@
-DIRS = {
-    0: (-1, 0),  # Up
-    1: (0, 1),   # Right
-    2: (1, 0),   # Down
-    3: (0, -1)   # Left
+DIRS = {        
+    0: (-1, 0),  # gor
+    1: (0, 1),   # desno
+    2: (1, 0),   # dol
+    3: (0, -1)   # levo
 }
 
-def get_player_crate_target_position(observation):
-    crate_cord = []
-    player_cord = None
-    target_cord = []
-    for i in range(len(observation)):
-        for j in range(len(observation[i])):
-            if observation[i][j] in [2, 4]:
-                crate_cord.append((i, j))
-            elif observation[i][j] == 5:
-                player_cord = (i, j)
-            elif observation[i][j] == 3:
-                target_cord.append((i, j))
-    return player_cord, tuple(crate_cord), tuple(target_cord)
+
+# -----------------------------------------------------------
+#import gymnasium as gym
+#import famnit_gym
+#import numpy as np
+
+
+
+# ta array je za delat mapo
+# 1 je zid, 5 je player, 2 je skatla in 3 je cilj
+#custom_map = np.array([
+#    [1, 1, 1, 1, 1],
+#    [1, 5, 0, 0, 1],
+#    [1, 0, 2, 0, 1],
+#    [1, 0, 0, 3, 1],
+#    [1, 1, 1, 1, 1],
+#], dtype=np.uint8)
+
+#env = gym.make('famnit_gym/Sokoban-v1', render_mode='human', options={'map_template': custom_map})
+#observation, info = env.reset()
+
+#def get_player_crate_target_position(observation):
+#    crate_cord = []
+#    player_cord = None
+#    target_cord = []
+#    for i in range(len(observation)):
+#        for j in range(len(observation[i])):
+#            if observation[i][j] in [2, 4]:
+#                crate_cord.append((i, j))
+#            elif observation[i][j] == 5:
+#                player_cord = (i, j)
+#            elif observation[i][j] == 3:
+#                target_cord.append((i, j))
+#    return player_cord, tuple(crate_cord), tuple(target_cord)
+
+# -----------------------------------------------------------
+
+
 
 def simulate(player, crates, action, map):
     (dx, dy) = DIRS[action]
@@ -26,15 +51,15 @@ def simulate(player, crates, action, map):
 
     crates = set(crates)
 
-    # Check if player moves into a wall
+    # prever a se zabijamo v steno
     if map[npx][npy] == 1:
         return None
 
-    # Check if player pushes a crate
+    # prever a porivamo skatlo
     if (npx, npy) in crates:
         ncx, ncy = npx + dx, npy + dy
 
-        # If crate can't move, invalid move
+        # prever a se skatla da premaknt
         if map[ncx][ncy] == 1 or (ncx, ncy) in crates:
             return None
 
@@ -44,7 +69,7 @@ def simulate(player, crates, action, map):
     return (npx, npy), tuple(crates)
 
 def bfs(player, crates, targets, map):
-    """Uninformed search: Breadth-First Search"""
+    #BFS main
     queue = [(player, crates, [])]
     visited = set()
 
@@ -56,11 +81,11 @@ def bfs(player, crates, targets, map):
             continue
         visited.add(state)
 
-        # Goal check
+        # prever gol
         if set(crates) == set(targets):
             return path
 
-        # Explore all moves
+        # razisc moznosti
         for move in range(4):
             nxt = simulate(player, crates, move, map)
             if nxt is None:

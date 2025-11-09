@@ -1,23 +1,46 @@
 DIRS = {
-    0: (-1, 0),  # Up
-    1: (0, 1),   # Right
-    2: (1, 0),   # Down
-    3: (0, -1)   # Left
+    0: (-1, 0),  # gor
+    1: (0, 1),   # desno
+    2: (1, 0),   # dol
+    3: (0, -1)   # levo
 }
 
-def get_player_crate_target_position(observation):
-    crate_cord = []
-    player_cord = None
-    target_cord = []
-    for i in range(len(observation)):
-        for j in range(len(observation[i])):
-            if observation[i][j] in [2, 4]:
-                crate_cord.append((i, j))
-            elif observation[i][j] == 5:
-                player_cord = (i, j)
-            elif observation[i][j] == 3:
-                target_cord.append((i, j))
-    return player_cord, tuple(crate_cord), tuple(target_cord)
+# -----------------------------------------------------------
+#import gymnasium as gym
+#import famnit_gym
+#import numpy as np
+
+
+
+# ta array je za delat mapo
+# 1 je zid, 5 je player, 2 je skatla in 3 je cilj
+#custom_map = np.array([
+#    [1, 1, 1, 1, 1],
+#    [1, 5, 0, 0, 1],
+#    [1, 0, 2, 0, 1],
+#    [1, 0, 0, 3, 1],
+#    [1, 1, 1, 1, 1],
+#], dtype=np.uint8)
+
+#env = gym.make('famnit_gym/Sokoban-v1', render_mode='human', options={'map_template': custom_map})
+#observation, info = env.reset()
+
+#def get_player_crate_target_position(observation):
+#    crate_cord = []
+#    player_cord = None
+#    target_cord = []
+#    for i in range(len(observation)):
+#        for j in range(len(observation[i])):
+#            if observation[i][j] in [2, 4]:
+#                crate_cord.append((i, j))
+#            elif observation[i][j] == 5:
+#                player_cord = (i, j)
+#            elif observation[i][j] == 3:
+#                target_cord.append((i, j))
+#    return player_cord, tuple(crate_cord), tuple(target_cord)
+
+# -----------------------------------------------------------
+
 
 def simulate(player, crates, action, map):
     (dx, dy) = DIRS[action]
@@ -26,22 +49,25 @@ def simulate(player, crates, action, map):
 
     crates = set(crates)
 
-    # Player hits wall
+    # prever a se zabijamo v steno
     if map[npx][npy] == 1:
         return None
 
-    # Player pushes crate
+    # prever a porivamo skatlo
     if (npx, npy) in crates:
         ncx, ncy = npx + dx, npy + dy
+
+        # prever a se skatla da premaknt
         if map[ncx][ncy] == 1 or (ncx, ncy) in crates:
             return None
+        
         crates.remove((npx, npy))
         crates.add((ncx, ncy))
 
     return (npx, npy), tuple(crates)
 
 def dfs(player, crates, targets, map, max_depth=5000):
-    """Uninformed search: Depth-First Search"""
+    #DFS main
     stack = [(player, crates, [])]
     visited = set()
 
@@ -53,15 +79,13 @@ def dfs(player, crates, targets, map, max_depth=5000):
             continue
         visited.add(state)
 
-        # Goal check
+        # prever gol
         if set(crates) == set(targets):
             return path
 
-        # Optional depth limit (to avoid infinite recursion)
-        if len(path) >= max_depth:
-            continue
 
-        # Explore moves (order affects exploration pattern)
+
+        # razisci moznosti
         for move in range(4):
             nxt = simulate(player, crates, move, map)
             if nxt is None:
@@ -70,7 +94,7 @@ def dfs(player, crates, targets, map, max_depth=5000):
             new_state = (new_player, tuple(sorted(new_crates)))
 
             if new_state not in visited:
-                # Push next state to stack (LIFO)
+               
                 stack.append((new_player, new_crates, path + [move]))
 
     return None
