@@ -46,7 +46,7 @@ def generate_custom_map(size):
 
     return map_array
 
-csv_file = "results_custom_maps.csv"
+csv_file = "results_custom_map_size.csv"
 
 with open(csv_file, mode="w", newline="") as f:
     writer = csv.writer(f)

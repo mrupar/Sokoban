@@ -57,7 +57,7 @@ def generate_custom_map(size, num_crates):
     return m
 
 
-csv_file = "results_custom_maps.csv"
+csv_file = "results_custom_map_size_goals.csv"
 
 with open(csv_file, mode="w", newline="") as f:
     writer = csv.writer(f)
