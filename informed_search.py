@@ -1,4 +1,5 @@
 import heapq
+import time
 
 
 DIRS = {
@@ -56,7 +57,9 @@ def simulate(player, crates, action, map):
     return ((npx, npy), tuple(crates))
 
 
-def astar(player, crates, targets, map):
+def astar(player, crates, targets, map, timeout=None):
+    
+    start_time = time.time()
 
     heap = []
     visited = set()
@@ -68,6 +71,8 @@ def astar(player, crates, targets, map):
 
 
     while heap:
+        if timeout and (time.time() - start_time) > timeout:
+            return -1
         f, g, player, crates, path = heapq.heappop(heap)
 
         state = (player, crates)

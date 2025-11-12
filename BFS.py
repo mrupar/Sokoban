@@ -1,3 +1,5 @@
+import time
+
 DIRS = {        
     0: (-1, 0),  # gor
     1: (0, 1),   # desno
@@ -68,12 +70,16 @@ def simulate(player, crates, action, map):
 
     return (npx, npy), tuple(crates)
 
-def bfs(player, crates, targets, map):
+def bfs(player, crates, targets, map, timeout=None):
+
+    start_time = time.time()
     #BFS main
     queue = [(player, crates, [])]
     visited = set()
 
     while queue:
+        if timeout and (time.time() - start_time) > timeout:
+            return -1
         player, crates, path = queue.pop(0)
         state = (player, tuple(sorted(crates)))
 

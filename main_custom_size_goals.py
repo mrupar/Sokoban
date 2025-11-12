@@ -57,52 +57,53 @@ def generate_custom_map(size, num_crates):
     return m
 
 
-csv_file = "results_custom_map_size_goals.csv"
-
-with open(csv_file, mode="w", newline="") as f:
-    writer = csv.writer(f)
-    writer.writerow(["map_id", "map_size", "num_crates", "algorithm", "time", "length", "map_string"])
-
-
-# Zamenji for loop range ce hocs kej vec al manj ampak 11 je zame nekje limit
-for map_id in range(1, 11):
-    size = 5 + map_id // 2        #velikost stpnevanje
-    num_crates = 1 + map_id // 2  # vsaki 2 mapi se doda nova škatla pa cilj
-    custom_map = generate_custom_map(size, num_crates)
-
-    env = gym.make("famnit_gym/Sokoban-v1", render_mode=None, options={"map_template": custom_map})
-    observation, info = env.reset()
-
-    player, crates, targets = get_player_crate_target_position(observation)
-
-    # A* del
-    start = time.time()
-    a_star_solution = astar(player, crates, targets, observation)
-    a_star_time = time.time() - start
-    a_star_length = len(a_star_solution) if a_star_solution is not None else 0
-
-    # DFS del
-    start = time.time()
-    dfs_solution = dfs(player, crates, targets, observation)
-    dfs_time = time.time() - start
-    dfs_length = len(dfs_solution) if dfs_solution is not None else 0
-
-    # BFS del
-    start = time.time()
-    bfs_solution = bfs(player, crates, targets, observation)
-    bfs_time = time.time() - start
-    bfs_length = len(bfs_solution) if bfs_solution is not None else 0
-
-    env.close()
-
-    #Ustvari results
+if __name__ == "__main__":
+    csv_file = "results_custom_map_size_goals.csv"
     
-    map_string = f'[{";".join([" ".join(map(str, row)) for row in observation])}]'
-
-    with open(csv_file, mode="a", newline="") as f:
+    with open(csv_file, mode="w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow([map_id, size, num_crates, "A*", a_star_time, a_star_length, map_string])
-        writer.writerow([map_id, size, num_crates, "DFS", dfs_time, dfs_length, map_string])
-        writer.writerow([map_id, size, num_crates, "BFS", bfs_time, bfs_length, map_string])
-
-    print(f"Map {map_id} (size={size}, crates={num_crates}) done.")
+        writer.writerow(["map_id", "map_size", "num_crates", "algorithm", "time", "length", "map_string"])
+    
+    
+    # Zamenji for loop range ce hocs kej vec al manj ampak 11 je zame nekje limit
+    for map_id in range(1, 11):
+        size = 5 + map_id // 2        #velikost stpnevanje
+        num_crates = 1 + map_id // 2  # vsaki 2 mapi se doda nova škatla pa cilj
+        custom_map = generate_custom_map(size, num_crates)
+    
+        env = gym.make("famnit_gym/Sokoban-v1", render_mode=None, options={"map_template": custom_map})
+        observation, info = env.reset()
+    
+        player, crates, targets = get_player_crate_target_position(observation)
+    
+        # A* del
+        start = time.time()
+        a_star_solution = astar(player, crates, targets, observation)
+        a_star_time = time.time() - start
+        a_star_length = len(a_star_solution) if a_star_solution is not None else 0
+    
+        # DFS del
+        start = time.time()
+        dfs_solution = dfs(player, crates, targets, observation)
+        dfs_time = time.time() - start
+        dfs_length = len(dfs_solution) if dfs_solution is not None else 0
+    
+        # BFS del
+        start = time.time()
+        bfs_solution = bfs(player, crates, targets, observation)
+        bfs_time = time.time() - start
+        bfs_length = len(bfs_solution) if bfs_solution is not None else 0
+    
+        env.close()
+    
+        #Ustvari results
+        
+        map_string = f'[{";".join([" ".join(map(str, row)) for row in observation])}]'
+    
+        with open(csv_file, mode="a", newline="") as f:
+            writer = csv.writer(f)
+            writer.writerow([map_id, size, num_crates, "A*", a_star_time, a_star_length, map_string])
+            writer.writerow([map_id, size, num_crates, "DFS", dfs_time, dfs_length, map_string])
+            writer.writerow([map_id, size, num_crates, "BFS", bfs_time, bfs_length, map_string])
+    
+        print(f"Map {map_id} (size={size}, crates={num_crates}) done.")

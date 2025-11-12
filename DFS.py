@@ -1,3 +1,5 @@
+import time
+
 DIRS = {
     0: (-1, 0),  # gor
     1: (0, 1),   # desno
@@ -66,12 +68,15 @@ def simulate(player, crates, action, map):
 
     return (npx, npy), tuple(crates)
 
-def dfs(player, crates, targets, map, max_depth=5000):
+def dfs(player, crates, targets, map, max_depth=5000, timeout=None):
+    start_time = time.time()
     #DFS main
     stack = [(player, crates, [])]
     visited = set()
 
     while stack:
+        if timeout and (time.time() - start_time) > timeout:
+            return -1
         player, crates, path = stack.pop()
         state = (player, tuple(sorted(crates)))
 
